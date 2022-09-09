@@ -203,6 +203,12 @@ suite('recur_iterator', function() {
 
       var start = ICAL.Time.fromString(options.dtStart);
       var recur = ICAL.Recur.fromString(ruleString);
+      if (options.throws) {
+        assert.throws(function() {
+          recur.iterator(start);
+        });
+        return;
+      }
       var iterator = recur.iterator(start);
 
       var inc = 0;
@@ -701,6 +707,48 @@ suite('recur_iterator', function() {
           '2023-06-29T08:00:00',
           '2023-09-29T08:00:00',
         ]
+      });
+
+      // 31st day of the month, every two months. Starting on a month that has 31 days.
+      testRRULE('FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=31', {
+        dtStart: '2022-07-01T08:00:00',
+        dates: [
+          '2022-07-31T08:00:00',
+          '2023-01-31T08:00:00',
+          '2023-03-31T08:00:00',
+          '2023-05-31T08:00:00',
+          '2023-07-31T08:00:00',
+        ]
+      });
+
+      // 31st day of the month, every two months. Starting on a month that has 30 days.
+      testRRULE('FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=31', {
+        dtStart: '2022-06-01T08:00:00',
+        dates: [
+          '2022-08-31T08:00:00',
+          '2022-10-31T08:00:00',
+          '2022-12-31T08:00:00',
+          '2023-08-31T08:00:00',
+          '2023-10-31T08:00:00',
+        ]
+      });
+
+      // 31st day of the month, every two months. Starting with three invalid months.
+      testRRULE('FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=31', {
+        dtStart: '2022-02-01T08:00:00',
+        dates: [
+          '2022-08-31T08:00:00',
+          '2022-10-31T08:00:00',
+          '2022-12-31T08:00:00',
+          '2023-08-31T08:00:00',
+          '2023-10-31T08:00:00',
+        ]
+      });
+
+      // Invalid rule. There's never a 31st of Feburary, check that this fails.
+      testRRULE('FREQ=MONTHLY;INTERVAL=12;BYMONTHDAY=31', {
+        dtStart: '2022-02-01T08:00:00',
+        throws: true,
       });
 
       // monthly + by month
