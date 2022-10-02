@@ -172,7 +172,7 @@ suite('timezone', function() {
     }
 
     var time = new ICAL.Time({
-      year: 2012,
+      year: 2032,
       zone: timezone
     });
     var expectedCoverage = calcYear(time.year);
@@ -181,7 +181,7 @@ suite('timezone', function() {
     assert.equal(timezone.expandedUntilYear, expectedCoverage);
 
     time = new ICAL.Time({
-      year: 2014,
+      year: 2034,
       zone: timezone
     });
 
@@ -202,13 +202,6 @@ suite('timezone', function() {
     expectedCoverage = calcYear(time.year);
     time.utcOffset();
     assert.equal(timezone.expandedUntilYear, expectedCoverage);
-
-    time = new ICAL.Time({
-      year: ICAL.Timezone.MAX_YEAR + 1,
-      zone: timezone
-    });
-    time.utcOffset();
-    assert.equal(timezone.expandedUntilYear, ICAL.Timezone.MAX_YEAR);
   });
 
   suite('#convertTime', function() {
