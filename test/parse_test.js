@@ -291,4 +291,29 @@ suite('parserv2', function() {
       assert.deepEqual(unfold(input), expected);
     });
   });
+
+  suite('embedded timezones', function() {
+    var icsDataEmbeddedTimezones;
+
+    testSupport.defineSample('timezone_from_file.ics', function(data) {
+      icsDataEmbeddedTimezones = data;
+    });
+
+    test('used in event date', function() {
+      var parsed = ICAL.parse(icsDataEmbeddedTimezones);
+      var component = new ICAL.Component(parsed);
+
+      var event = new ICAL.Event(component.getFirstSubcomponent('vevent'));
+      var startDate = event.startDate.toJSDate();
+      var endDate = event.endDate.toJSDate();
+
+      assert.equal(startDate.getUTCDate(), 6);
+      assert.equal(startDate.getUTCHours(), 21);
+      assert.equal(startDate.getUTCMinutes(), 23);
+
+      assert.equal(endDate.getUTCDate(), 6);
+      assert.equal(endDate.getUTCHours(), 22);
+      assert.equal(endDate.getUTCMinutes(), 23);
+    });
+  });
 });

@@ -42,8 +42,8 @@ suite('recur_expansion', function() {
   suite('initialization', function() {
     test('successful', function() {
       assert.deepEqual(
-        new Date(2012, 9, 2, 10),
-        subject.last.toJSDate()
+        subject.last.toJSDate(),
+        new Date('2012-10-02T17:00:00Z')
       );
 
       assert.instanceOf(subject.ruleIterators, Array);
@@ -92,31 +92,30 @@ suite('recur_expansion', function() {
   suite('#_ensureRules', function() {
     test('.ruleDates', function() {
       var expected = [
-        new Date(2012, 10, 5, 10),
-        new Date(2012, 10, 10, 10),
-        new Date(2012, 10, 30, 10)
+        new Date('2012-11-05T18:00:00.000Z'),
+        new Date('2012-11-10T18:00:00.000Z'),
+        new Date('2012-11-30T18:00:00.000Z')
       ];
-
 
       var dates = subject.ruleDates.map(function(time) {
         return time.toJSDate();
       });
 
-      assert.deepEqual(expected, dates);
+      assert.deepEqual(dates, expected);
     });
 
     test('.exDates', function() {
       var expected = [
-        new Date(2012, 11, 4, 10),
-        new Date(2013, 1, 5, 10),
-        new Date(2013, 3, 2, 10)
+        new Date('2012-12-04T18:00:00.000Z'),
+        new Date('2013-02-05T18:00:00.000Z'),
+        new Date('2013-04-02T17:00:00.000Z')
       ];
 
       var dates = subject.exDates.map(function(time) {
         return time.toJSDate();
       });
 
-      assert.deepEqual(expected, dates);
+      assert.deepEqual(dates, expected);
     });
   });
 
@@ -210,12 +209,12 @@ suite('recur_expansion', function() {
     // I use JS dates widely because its much easier
     // to compare them via chai's deepEquals function
     var expected = [
-      new Date(2012, 9, 2, 10),
-      new Date(2012, 10, 5, 10),
-      new Date(2012, 10, 6, 10),
-      new Date(2012, 10, 10, 10),
-      new Date(2012, 10, 30, 10),
-      new Date(2013, 0, 1, 10)
+      new Date('2012-10-02T17:00:00.000Z'),
+      new Date('2012-11-05T18:00:00.000Z'),
+      new Date('2012-11-06T18:00:00.000Z'),
+      new Date('2012-11-10T18:00:00.000Z'),
+      new Date('2012-11-30T18:00:00.000Z'),
+      new Date('2013-01-01T18:00:00.000Z')
     ];
 
     test('6 items', function() {
@@ -245,11 +244,11 @@ suite('recur_expansion', function() {
 
       var dates = [];
       var expected = [
-        new Date(2012, 9, 2, 10),
-        new Date(2012, 10, 5, 10),
-        new Date(2012, 10, 6, 10),
-        new Date(2012, 10, 10, 10),
-        new Date(2012, 11, 4, 10)
+        new Date('2012-10-02T17:00:00.000Z'),
+        new Date('2012-11-05T18:00:00.000Z'),
+        new Date('2012-11-06T18:00:00.000Z'),
+        new Date('2012-11-10T18:00:00.000Z'),
+        new Date('2012-12-04T18:00:00.000Z')
       ];
 
       while (inc++ < max && (next = subject.next())) {
@@ -270,6 +269,11 @@ suite('recur_expansion', function() {
 
 
   suite('#toJSON', function() {
+    // While other tests in this file don't require specifying a timezone, we
+    // need to do so here because we're building the `RecurExpansion` from a
+    // limited subset of the ICS which does not include the timezone definition.
+    testSupport.useTimezones('America/Los_Angeles');
+
     test('from start', function() {
       var json = subject.toJSON();
       var newIter = new ICAL.RecurExpansion(json);
