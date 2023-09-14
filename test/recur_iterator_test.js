@@ -203,13 +203,12 @@ suite('recur_iterator', function() {
 
       var start = ICAL.Time.fromString(options.dtStart);
       var recur = ICAL.Recur.fromString(ruleString);
-      if (options.throws) {
-        assert.throws(function() {
-          recur.iterator(start);
-        });
+
+      var iterator = recur.iterator(start);
+      if (options.noInstance) {
+        assert.equal(iterator.next(), null);
         return;
       }
-      var iterator = recur.iterator(start);
 
       var inc = 0;
       var dates = [];
@@ -745,10 +744,10 @@ suite('recur_iterator', function() {
         ]
       });
 
-      // Invalid rule. There's never a 31st of Feburary, check that this fails.
+      // Invalid rule. There's never a 31st of February, check that this fails.
       testRRULE('FREQ=MONTHLY;INTERVAL=12;BYMONTHDAY=31', {
         dtStart: '2022-02-01T08:00:00',
-        throws: true,
+        noInstance: true,
       });
 
       // monthly + by month
@@ -1023,6 +1022,13 @@ suite('recur_iterator', function() {
         ]
       });
 
+      // Invalid recurrence rule. The first Monday can never fall later than the
+      // 7th.
+      testRRULE('FREQ=YEARLY;BYMONTHDAY=15,16,17,18,19,20,21;BYDAY=1MO', {
+        dtStart: '2015-01-01T08:00:00',
+        noInstance: true,
+      });
+
       // Tycho brahe days - yearly, byYearDay with negative offsets
       testRRULE('FREQ=YEARLY;BYYEARDAY=1,2,4,6,11,12,20,42,48,49,-306,-303,' +
                 '-293,-292,-266,-259,-258,-239,-228,-209,-168,-164,-134,-133,' +
@@ -1084,8 +1090,8 @@ suite('recur_iterator', function() {
         ]
       });
 
-      /* 
-       * Leap-year test for February 29th 
+      /*
+       * Leap-year test for February 29th
        *
        * See https://github.com/kewisch/ical.js/issues/91
        * for details
