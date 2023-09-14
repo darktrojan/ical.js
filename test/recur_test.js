@@ -29,7 +29,7 @@ suite('recur', function() {
       });
     }
 
-    function checkThrow(data, expectedMessage, dtstart, stack) {
+    function checkNoInstance(data, expectedMessage, dtstart, stack) {
       test(expectedMessage, function() {
         var recur = new ICAL.Recur(data);
         if (dtstart) {
@@ -37,48 +37,47 @@ suite('recur', function() {
         } else {
           dtstart = ICAL.Time.epochTime.clone();
         }
-        assert.throws(function() {
-          var iter = recur.iterator(dtstart);
-        }, expectedMessage);
+        var iter = recur.iterator(dtstart);
+        assert.equal(iter.next(), null);
       });
     }
 
-    checkThrow({
+    checkNoInstance({
       parts: {
         BYYEARDAY: [3, 4, 5],
         BYMONTH: [2]
       }
     }, 'Invalid BYYEARDAY rule');
 
-    checkThrow({
+    checkNoInstance({
       parts: {
         BYWEEKNO: [3],
         BYMONTHDAY: [2]
       }
    }, 'BYWEEKNO does not fit to BYMONTHDAY');
 
-    checkThrow({
+    checkNoInstance({
       freq: 'MONTHLY',
       parts: {
         BYWEEKNO: [30]
       }
     }, 'For MONTHLY recurrences neither BYYEARDAY nor BYWEEKNO may appear');
 
-    checkThrow({
+    checkNoInstance({
       freq: 'WEEKLY',
       parts: {
         BYMONTHDAY: [20]
       }
     }, 'For WEEKLY recurrences neither BYMONTHDAY nor BYYEARDAY may appear');
 
-    checkThrow({
+    checkNoInstance({
       freq: 'DAILY',
       parts: {
         BYYEARDAY: [200]
       }
     }, 'BYYEARDAY may only appear in YEARLY rules');
 
-    checkThrow({
+    checkNoInstance({
       freq: 'MONTHLY',
       parts: {
         BYDAY: ['-6TH']
